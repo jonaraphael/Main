@@ -21,6 +21,10 @@ class BodyModel:
         self.LEG1_OFFSET_X = c.getfloat(section, "leg1_offset_x")
         self.LEG1_OFFSET_Y = c.getfloat(section, "leg1_offset_y")
         self.CHASSIS_BOTTOM_Z = c.getfloat(section, "chassis_bottom_z")
+        
+        # COM parameters
+        self.CHASSIS_MASS = c.getfloat(section, "chassis_mass")
+        self.CHASSIS_COM_COORD = [c.getfloat(section, "chassis_com_x"), c.getfloat(section, "chassis_com_y"), c.getfloat(section, "chassis_com_z")]
 
     def setSensorReadings(self, leg_sensor_matrix, imu_orientation, imu_angular_rates):
         self.leg_sensor_matrix = leg_sensor_matrix
@@ -117,7 +121,7 @@ class BodyModel:
                 break
         return can_lift
     
-    
-    
-    
-    
+    def getCOM(self):
+        legs_pos = sum(array(self.transformLeg2Body(i,self.getLegs()[i].getCOM())) for i in range(NUM_LEGS))
+        COM_pos = (self.CHASSIS_MASS*array(self.CHASSIS_COM_COORD)+legs_pos*6*self.getLegs()[0].LEG_MASS)/(self.CHASSIS_MASS+6*self.getLegs()[0].LEG_MASS)
+        return COM_pos
