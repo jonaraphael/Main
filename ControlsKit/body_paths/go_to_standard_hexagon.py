@@ -1,5 +1,5 @@
 from ControlsKit import time_sources, leg_model, leg_paths, leg_logger
-from ControlsKit.leg_paths import TrapezoidalFootMove, PutFootOnGround
+from ControlsKit.leg_paths import SafeMove, PutFootOnGround
 from ControlsKit.math_utils import NUM_LEGS, array
 from scipy import zeros, append
 
@@ -38,7 +38,7 @@ class GoToStandardHexagon:
         # Put all 6 legs in place
         for i in range(NUM_LEGS):
             if not self.on_ground[i] and not self.in_place[i]:
-                self.foot_paths[i]=TrapezoidalFootMove(
+                self.foot_paths[i]=SafeMove(
                     self.model.getLegs()[i],
                     self.controller.getLimbControllers()[i],
                     self.lifted,
@@ -78,7 +78,7 @@ class GoToStandardHexagon:
             elif self.state == self.EVENS:
                 for i in range(NUM_LEGS):
                     if not i%2 and not self.in_place[i]:
-                        self.foot_paths[i]=TrapezoidalFootMove(
+                        self.foot_paths[i]=SafeMove(
                             self.model.getLegs()[i],
                             self.controller.getLimbControllers()[i],
                             self.lifted,
@@ -98,7 +98,7 @@ class GoToStandardHexagon:
             elif self.state == self.ODDS:
                 for i in range(NUM_LEGS):
                     if i%2 and not self.in_place[i]:
-                        self.foot_paths[i]=TrapezoidalFootMove(
+                        self.foot_paths[i]=SafeMove(
                             self.model.getLegs()[i],
                             self.controller.getLimbControllers()[i],
                             self.lifted,
@@ -117,7 +117,7 @@ class GoToStandardHexagon:
                 self.phase_done = False
             elif self.state == self.STAND:
                 for i in range(NUM_LEGS):
-                    self.foot_paths[i]=TrapezoidalFootMove(
+                    self.foot_paths[i]=SafeMove(
                         self.model.getLegs()[i],
                         self.controller.getLimbControllers()[i],
                         self.lowered,
