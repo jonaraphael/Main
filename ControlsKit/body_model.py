@@ -104,7 +104,7 @@ class BodyModel:
         """
         foot_pos = self.getFootPositionsInBodyFrame()
         COM = [0,0,0] # Calculate this for real in another section of the body model?
-        g = [0,0,-1]#self.imu_orientation # DELETE THIS COMMENT once someone confirms this is in the form of a vector pointing parallel to gravity
+        g = self.imu_orientation[0:7:3] # DELETE THIS COMMENT once someone confirms this is in the form of a vector pointing parallel to gravity
         on_ground = [self.getLegs()[i].isFootOnGround() for i in range(NUM_LEGS)]
         for i in leg_index:
             on_ground[i] = False
