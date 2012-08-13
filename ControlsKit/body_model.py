@@ -107,8 +107,8 @@ class BodyModel:
         """ Takes in a set of leg indices, and reports if all of them can be lifted simultaneously
         """
         foot_pos = self.getFootPositionsInBodyFrame()
-        COM = [0,0,0] # Calculate this for real in another section of the body model?
-        g = self.imu_orientation[0:7:3] # DELETE THIS COMMENT once someone confirms this is in the form of a vector pointing parallel to gravity
+        COM = self.getCOM()
+        g = self.imu_orientation[0:7:3] # This should be changed to point towards the acceleration vector of the imu, not the auto-corrected downward vector.
         on_ground = [self.getLegs()[i].isFootOnGround() for i in range(NUM_LEGS)]
         for i in leg_index:
             on_ground[i] = False
