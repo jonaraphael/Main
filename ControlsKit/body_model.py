@@ -40,7 +40,7 @@ class BodyModel:
     def getJointAngleMatrix(self):
         return [self.legs[i].getJointAngles() for i in range(NUM_LEGS)]
     
-    def getFootPositions(self):
+    def getFootPositionsInLegFrames(self):
         return [self.legs[i].getFootPos() for i in range(NUM_LEGS)]
     
     def getFootPositionsInBodyFrame(self):
