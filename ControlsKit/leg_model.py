@@ -28,8 +28,7 @@ class LegModel:
         self.YAW_MASS = c.getfloat(section, "yaw_mass")
         self.THIGH_MASS = c.getfloat(section, "thigh_mass")
         self.CALF_MASS = c.getfloat(section, "calf_mass")
-        self.FOOT_MASS = c.getfloat(section, "foot_mass")
-        self.LEG_MASS = self.YAW_MASS+self.THIGH_MASS+self.CALF_MASS+self.FOOT_MASS
+        self.LEG_MASS = self.YAW_MASS+self.THIGH_MASS+self.CALF_MASS
 
         # Actuator soft bounds
         soft_stops_section = 'SoftStops'
@@ -162,8 +161,6 @@ class LegModel:
         calf_pos = rotateY(calf_pos, joint_angles[HP])
         calf_pos[X] += self.YAW_LEN
         calf_pos = rotateZ(calf_pos, joint_angles[YAW])
-        # Calculate Foot position
-        foot_pos = self.getFootPos()
         
-        COM_pos = (yaw_pos*self.YAW_MASS+thigh_pos*self.THIGH_MASS+calf_pos*self.CALF_MASS+foot_pos*self.FOOT_MASS)/(self.LEG_MASS)
+        COM_pos = (yaw_pos*self.YAW_MASS+thigh_pos*self.THIGH_MASS+calf_pos*self.CALF_MASS)/(self.LEG_MASS)
         return COM_pos
