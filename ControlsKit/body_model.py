@@ -1,7 +1,7 @@
 from ConfigParser import ConfigParser
 from leg_model import LegModel
 from UI import logger
-from math_utils import NUM_LEGS, rotateZ, formPermutations, inTriangle
+from math_utils import NUM_LEGS, rotateZ, formPermutations, inTriangle, planeFromPoints
 from scipy import array, pi, nonzero
 import os.path as path
 
@@ -108,7 +108,8 @@ class BodyModel:
         """
         foot_pos = self.getFootPositionsInBodyFrame()
         COM = self.getCOM()
-        g = self.imu_orientation[0:7:3] # This should be changed to point towards the acceleration vector of the imu, not the auto-corrected downward vector.
+        g = self.imu_orientation[0:7:3] # This should be changed to align with
+            # the acceleration vector of the imu, not the auto-corrected downward vector.
         on_ground = [self.getLegs()[i].isFootOnGround() for i in range(NUM_LEGS)]
         for i in leg_index:
             on_ground[i] = False
@@ -122,6 +123,28 @@ class BodyModel:
         return can_lift
     
     def getCOM(self):
-        legs_pos = sum(array(self.transformLeg2Body(i,self.getLegs()[i].getCOM())) for i in range(NUM_LEGS))
-        COM_pos = (self.CHASSIS_MASS*array(self.CHASSIS_COM_COORD)+legs_pos*6*self.getLegs()[0].LEG_MASS)/(self.CHASSIS_MASS+6*self.getLegs()[0].LEG_MASS)
+        Legs = self.getLegs()
+        legs_pos = sum(array(self.transformLeg2Body(i,Legs[i].getCOM()))
+            for i in range(NUM_LEGS))
+        COM_pos = (self.CHASSIS_MASS*array(self.CHASSIS_COM_COORD)+
+            legs_pos*6*Legs[0].LEG_MASS)/(self.CHASSIS_MASS+6*Legs[0].LEG_MASS)
         return COM_pos
+
+    def getGroundPlane(self):
+        Legs = self.getLegs()
+        on_ground = [self.getLegs()[i].isFootOnGround() for i in range(NUM_LEGS)]
+        on_ground_indices = nonzero(on_ground)[0]
+        points = array([self.transformLeg2Body(i,Legs[i].getFootPos()) for i in on_ground_indices])
+        try:
+            abc = planeFromPoints(points)
+        except:
+            abc = None
+        return abc
+    
+    def getGroundEstimate(self, xy = [0,0]):
+        abc = self.getGroundPlane()
+        try:
+            z = xy[0]*abc[0]+xy[1]*abc[1]+abc[2]
+        except:
+            z = None
+        return z
